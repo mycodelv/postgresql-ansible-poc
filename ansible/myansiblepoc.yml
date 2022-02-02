@@ -1,0 +1,60 @@
+---
+- hosts: all
+  tasks:
+  - name: Check host availability
+    command: ansible all --list-hosts
+
+- hosts: control
+  tasks:
+  - name: Remove previos log files and csv files
+    shell: find ./ansible/ -name "*.csv" -delete; find ./ansible/ -name "*.log" -delete
+    ignore_errors: yes
+
+- hosts: control
+  tasks:
+  - name: Drop sequence
+    shell: ./ansible/drseq.sh >> ./ansible/drseq.log 2>&1
+    ignore_errors: yes
+
+- hosts: control
+  tasks:
+  - name: Drop table
+    shell: ./ansible/drtable.sh >> ./ansible/drtable.log 2>&1
+    ignore_errors: yes
+
+- hosts: control
+  tasks:
+  - name: Drop procedure
+    shell: ./ansible/drproc.sh >> ./ansible/drproc.log 2>&1
+    ignore_errors: yes
+
+- hosts: control
+  tasks:
+  - name: Create table
+    shell: ./ansible/crtable.sh >> ./ansible/crtable.log 2>&1
+
+- hosts: control
+  tasks:
+  - name: Create sequence
+    shell: ./ansible/crseq.sh >> ./ansible/crseq.log 2>&1
+
+- hosts: control
+  tasks:
+  - name: Create procedure
+    shell: ./ansible/crproc.sh >> ./ansible/crproc.log 2>&1
+
+- hosts: control
+  tasks:
+  - name: Generate data more than 100000 rows
+    shell: ./ansible/callgendata.sh >> ./ansible/callgendata.log 2>&1
+
+- hosts: control
+  tasks:
+  - name: Execute query on control host from Primary
+    shell: ./ansible/q.sh >> ./ansible/q.log 2>&1
+
+- hosts: control
+  tasks:
+  - name: Execute query on control host from Standby
+    shell: ./ansible/qs.sh >> ./ansible/qs.log 2>&1
+
